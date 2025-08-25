@@ -62,7 +62,7 @@ export function LocationDetailPage({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-6 space-y-6">
+        <div className="mt-2 space-y-6">
           <div className="space-y-2">
             <h3 className="text-sm font-medium">Location Coordinates</h3>
             <div className="text-sm text-muted-foreground">

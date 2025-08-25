@@ -66,7 +66,7 @@ export function LocationDetailsSheet({
     Omit<LocationDetails, "lat" | "lng">
   >({
     category: "moderate",
-    radius: 1000,
+    radius: 500,
     notes: "",
   });
 
@@ -80,7 +80,7 @@ export function LocationDetailsSheet({
       onOpenChange(false);
       setFormData({
         category: "moderate",
-        radius: 1000,
+        radius: 500,
         notes: "",
       });
     }
@@ -109,7 +109,7 @@ export function LocationDetailsSheet({
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6 px-4">
+        <div className="mt-2 space-y-6 px-4">
           {location && (
             <div className="space-y-2">
               <Label className="text-sm font-medium">
@@ -171,7 +171,7 @@ export function LocationDetailsSheet({
               value={[formData.radius]}
               onValueChange={handleRadiusChange}
               max={5000}
-              min={1000}
+              min={500}
               step={100}
               className="w-full"
             />

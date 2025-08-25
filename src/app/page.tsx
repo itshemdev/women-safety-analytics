@@ -20,6 +20,7 @@ import {
   LocationDetailsWithId,
 } from "@/lib/firestoreService";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 
 interface LocationDetailsInput {
   lat: number;
@@ -50,6 +51,7 @@ export default function Home() {
     useState<LocationDetailsWithId | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [tempMarker, setTempMarker] = useState<{
     lat: number;
     lng: number;
@@ -61,18 +63,43 @@ export default function Home() {
   } | null>(null);
   const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [currentZoom, setCurrentZoom] = useState(12);
 
   useEffect(() => {
     const loadSafetyZones = async () => {
       try {
         setIsLoading(true);
+        setLoadingProgress(0);
+
+        // Simulate loading progress
+        const progressInterval = setInterval(() => {
+          setLoadingProgress((prev) => {
+            if (prev >= 90) {
+              clearInterval(progressInterval);
+              return prev;
+            }
+            return prev + 10;
+          });
+        }, 100);
+
         const zones = await getSafetyZones();
         setSavedLocations(zones);
+
+        // Complete the progress
+        clearInterval(progressInterval);
+        setLoadingProgress(100);
+
+        // Small delay to show completion
+        setTimeout(() => {
+          setIsLoading(false);
+          setLoadingProgress(0);
+        }, 200);
       } catch (error) {
         console.error("Error loading safety zones:", error);
         toast.error("Failed to load safety zones");
-      } finally {
         setIsLoading(false);
+        setLoadingProgress(0);
       }
     };
 
@@ -104,9 +131,12 @@ export default function Home() {
       setIsSheetOpen(true);
 
       if (mapRef) {
+        // Preserve current zoom level when panning to clicked location
+        const currentZoomLevel = mapRef.getZoom() || currentZoom;
         mapRef.panTo(
           new google.maps.LatLng(clickedLocation.lat, clickedLocation.lng)
         );
+        mapRef.setZoom(currentZoomLevel);
       }
     }
   };
@@ -114,10 +144,27 @@ export default function Home() {
   const handleMarkerClick = (location: LocationDetailsWithId) => {
     setSelectedSavedLocation(location);
     setIsDetailOpen(true);
+
+    // Center map on the clicked location
+    if (mapRef) {
+      const currentZoomLevel = mapRef.getZoom() || currentZoom;
+      mapRef.panTo(new google.maps.LatLng(location.lat, location.lng));
+      mapRef.setZoom(currentZoomLevel);
+    }
+  };
+
+  const handleCircleClick = (lat: number, lng: number) => {
+    // Center map on the clicked circle
+    if (mapRef) {
+      const currentZoomLevel = mapRef.getZoom() || currentZoom;
+      mapRef.panTo(new google.maps.LatLng(lat, lng));
+      mapRef.setZoom(currentZoomLevel);
+    }
   };
 
   const handleSaveLocation = async (details: LocationDetailsInput) => {
     try {
+      setIsSaving(true);
       const zoneId = await saveSafetyZone(details);
       const newZone: LocationDetailsWithId = {
         ...details,
@@ -129,16 +176,18 @@ export default function Home() {
       setTempCircle(null);
 
       if (mapRef) {
-        const bounds = new google.maps.LatLngBounds();
-        bounds.extend(new google.maps.LatLng(newZone.lat, newZone.lng));
-        mapRef.fitBounds(bounds);
-        mapRef.setZoom(Math.min(mapRef.getZoom() || 15, 15));
+        // Preserve current zoom level and only pan to the new location
+        const currentZoomLevel = mapRef.getZoom() || currentZoom;
+        mapRef.panTo(new google.maps.LatLng(newZone.lat, newZone.lng));
+        mapRef.setZoom(currentZoomLevel);
       }
 
       toast.success("Location saved successfully!");
     } catch (error) {
       console.error("Error saving location:", error);
       toast.error("Failed to save location");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -180,10 +229,58 @@ export default function Home() {
     }
   };
 
-  if (!isLoaded) return <div>Loading...</div>;
+  if (!isLoaded)
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="text-gray-600">Loading Google Maps...</p>
+        </div>
+      </div>
+    );
 
   return (
     <div className="relative w-full h-screen">
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Loading Safety Zones
+              </h3>
+              <p className="text-sm text-gray-600">
+                Please wait while we load your safety data...
+              </p>
+              <div className="space-y-2">
+                <Progress value={loadingProgress} className="w-full" />
+                <p className="text-xs text-gray-500">
+                  {loadingProgress}% complete
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Saving Overlay */}
+      {isSaving && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80">
+            <div className="text-center space-y-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"></div>
+              <h3 className="text-lg font-semibold text-gray-800">
+                Saving Location
+              </h3>
+              <p className="text-sm text-gray-600">
+                Please wait while we save your safety zone...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="absolute top-0 left-0 right-0 z-10 bg-white shadow-md">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
@@ -209,6 +306,11 @@ export default function Home() {
         zoom={12}
         onClick={handleMapClick}
         onLoad={setMapRef}
+        onZoomChanged={() => {
+          if (mapRef) {
+            setCurrentZoom(mapRef.getZoom() || 12);
+          }
+        }}
       >
         {position && <Marker position={position} />}
 
@@ -239,6 +341,7 @@ export default function Home() {
               strokeOpacity: 0.6,
               strokeWeight: 2,
             }}
+            onClick={() => handleCircleClick(tempCircle.lat, tempCircle.lng)}
           />
         )}
 
@@ -271,6 +374,7 @@ export default function Home() {
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
               }}
+              onClick={() => handleCircleClick(location.lat, location.lng)}
             />
           </div>
         ))}
