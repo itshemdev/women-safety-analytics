@@ -44,8 +44,8 @@ export function SOSButton() {
         });
       }
 
-      // Then send to all registered devices via API
-      const response = await fetch("/api/send-sos", {
+      // Then send to all registered devices via FCM API
+      const response = await fetch("/api/send-sos-fcm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

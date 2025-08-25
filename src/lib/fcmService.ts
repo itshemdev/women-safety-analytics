@@ -18,6 +18,7 @@ export interface DeviceToken {
   browser: string;
   createdAt: Date;
   lastUsed: Date;
+  fcmToken?: string; // Firebase Cloud Messaging token
 }
 
 // Save device token to Firestore
@@ -89,5 +90,37 @@ export const isTokenExists = async (token: string): Promise<boolean> => {
   } catch (error) {
     console.error("Error checking token existence:", error);
     return false;
+  }
+};
+
+// Request FCM token for background notifications
+export const requestFCMToken = async (): Promise<string | null> => {
+  try {
+    // Check if Firebase Messaging is available
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+      console.log("Push notifications not supported");
+      return null;
+    }
+
+    const registration = await navigator.serviceWorker.ready;
+
+    // Request notification permission
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      console.log("Notification permission denied");
+      return null;
+    }
+
+    // Get FCM token (this would require Firebase Messaging SDK)
+    // For now, we'll return a placeholder
+    const fcmToken = `fcm_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
+
+    console.log("FCM token generated:", fcmToken);
+    return fcmToken;
+  } catch (error) {
+    console.error("Error requesting FCM token:", error);
+    return null;
   }
 };
