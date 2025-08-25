@@ -82,9 +82,12 @@ class PushNotificationService {
     if (!this.currentToken) return false;
 
     try {
-      const response = await fetch(`/api/register-token?token=${this.currentToken}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/register-token?token=${this.currentToken}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to unregister token");

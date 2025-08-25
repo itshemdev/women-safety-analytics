@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     return NextResponse.json({
       success: true,
@@ -40,7 +40,6 @@ export async function POST(request: NextRequest) {
       tokenId: `mock-token-${Date.now()}`,
       note: "This is a development mock. In production, this would store tokens in Firebase.",
     });
-
   } catch (error) {
     console.error("Error registering token:", error);
     return NextResponse.json(
@@ -69,14 +68,13 @@ export async function DELETE(request: NextRequest) {
     });
 
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     return NextResponse.json({
       success: true,
       message: "Token unregistered successfully (mock mode)",
       note: "This is a development mock. In production, this would remove tokens from Firebase.",
     });
-
   } catch (error) {
     console.error("Error unregistering token:", error);
     return NextResponse.json(

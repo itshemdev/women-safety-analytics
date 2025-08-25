@@ -4,7 +4,13 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Phone, MapPin, Users } from "lucide-react";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface SOSButtonProps {
   userPosition: { lat: number; lng: number } | null;
@@ -14,7 +20,8 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
   const [isPressed, setIsPressed] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isSending, setIsSending] = useState(false);
-  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>("default");
+  const [notificationPermission, setNotificationPermission] =
+    useState<NotificationPermission>("default");
 
   useEffect(() => {
     // Check notification permission
@@ -44,18 +51,18 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
   const sendSOSAlert = async () => {
     try {
       setIsSending(true);
-      
+
       // Request notification permission if needed
       const permission = await requestNotificationPermission();
-      
+
       if (permission !== "granted") {
         toast.error("Notification permission is required for SOS alerts");
         return;
       }
 
       // Get user's current location
-      const location = userPosition || await getCurrentLocation();
-      
+      const location = userPosition || (await getCurrentLocation());
+
       if (!location) {
         toast.error("Unable to get your location");
         return;
@@ -91,13 +98,14 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
         });
       }
 
-      toast.success("SOS Alert sent! Emergency services and nearby users notified.");
-      
+      toast.success(
+        "SOS Alert sent! Emergency services and nearby users notified."
+      );
+
       // Auto-dial emergency number (if supported)
       if (navigator.userAgent.includes("Mobile")) {
         window.location.href = "tel:911";
       }
-
     } catch (error) {
       console.error("Error sending SOS alert:", error);
       toast.error("Failed to send SOS alert. Please try again.");
@@ -137,9 +145,10 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
           size="lg"
           className={`
             h-16 w-16 rounded-full shadow-lg transition-all duration-200
-            ${isPressed 
-              ? "bg-red-700 scale-95 shadow-xl" 
-              : "bg-red-600 hover:bg-red-700 hover:scale-105"
+            ${
+              isPressed
+                ? "bg-red-700 scale-95 shadow-xl"
+                : "bg-red-600 hover:bg-red-700 hover:scale-105"
             }
             ${isSending ? "animate-pulse" : ""}
           `}
@@ -152,7 +161,7 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
         >
           <AlertTriangle className="h-8 w-8" />
         </Button>
-        
+
         {/* Label */}
         <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-red-600 text-white px-2 py-1 rounded text-xs font-medium whitespace-nowrap">
           SOS
@@ -168,7 +177,8 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
               Emergency SOS Alert
             </DialogTitle>
             <DialogDescription>
-              This will send an emergency alert to all nearby users and emergency services.
+              This will send an emergency alert to all nearby users and
+              emergency services.
             </DialogDescription>
           </DialogHeader>
 
@@ -192,10 +202,9 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
               <div className="text-sm">
                 <div className="font-medium">Alert Recipients</div>
                 <div className="text-blue-600">
-                  {notificationPermission === "granted" 
-                    ? "All nearby users will be notified" 
-                    : "Notification permission required"
-                  }
+                  {notificationPermission === "granted"
+                    ? "All nearby users will be notified"
+                    : "Notification permission required"}
                 </div>
               </div>
             </div>
@@ -205,7 +214,9 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
               <Phone className="h-4 w-4 text-red-600" />
               <div className="text-sm">
                 <div className="font-medium">Emergency Services</div>
-                <div className="text-red-600">911 will be called automatically</div>
+                <div className="text-red-600">
+                  911 will be called automatically
+                </div>
               </div>
             </div>
 

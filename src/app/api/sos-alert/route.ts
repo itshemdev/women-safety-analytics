@@ -33,13 +33,15 @@ export async function POST(request: NextRequest) {
 
     // Simulate sending notifications to all users
     const mockRecipientsCount = Math.floor(Math.random() * 10) + 1;
-    
-    console.log(`📱 Mock: SOS Alert would be sent to ${mockRecipientsCount} users`);
+
+    console.log(
+      `📱 Mock: SOS Alert would be sent to ${mockRecipientsCount} users`
+    );
     console.log("📞 Mock: Emergency services would be notified");
     console.log("📍 Mock: Location data would be shared with responders");
 
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     return NextResponse.json({
       success: true,
@@ -48,7 +50,6 @@ export async function POST(request: NextRequest) {
       message: "SOS alert sent successfully (mock mode)",
       note: "This is a development mock. In production, this would send real push notifications.",
     });
-
   } catch (error) {
     console.error("Error sending SOS alert:", error);
     return NextResponse.json(
@@ -59,7 +60,11 @@ export async function POST(request: NextRequest) {
 }
 
 // Mock function for emergency services
-async function sendToEmergencyServices(lat: number, lng: number, userId: string) {
+async function sendToEmergencyServices(
+  lat: number,
+  lng: number,
+  userId: string
+) {
   console.log(`🚨 Emergency Services Alert (Mock):
     Location: ${lat}, ${lng}
     User: ${userId}

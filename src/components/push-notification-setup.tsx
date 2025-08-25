@@ -8,7 +8,8 @@ import { pushNotificationService } from "@/lib/pushNotificationService";
 
 export function PushNotificationSetup() {
   const [isSupported, setIsSupported] = useState(false);
-  const [permission, setPermission] = useState<NotificationPermission>("default");
+  const [permission, setPermission] =
+    useState<NotificationPermission>("default");
   const [isRegistered, setIsRegistered] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,7 +37,7 @@ export function PushNotificationSetup() {
 
       // Request permission
       const granted = await pushNotificationService.requestPermission();
-      
+
       if (!granted) {
         toast.error("Notification permission is required for SOS alerts");
         return;
@@ -54,7 +55,6 @@ export function PushNotificationSetup() {
       } else {
         toast.error("Failed to enable push notifications");
       }
-
     } catch (error) {
       console.error("Error enabling notifications:", error);
       toast.error("Failed to enable notifications");
@@ -75,7 +75,6 @@ export function PushNotificationSetup() {
       } else {
         toast.error("Failed to disable notifications");
       }
-
     } catch (error) {
       console.error("Error disabling notifications:", error);
       toast.error("Failed to disable notifications");
@@ -102,9 +101,7 @@ export function PushNotificationSetup() {
       <div className="fixed top-4 left-4 z-40 bg-green-50 border border-green-200 rounded-lg p-3 shadow-sm">
         <div className="flex items-center gap-2">
           <CheckCircle className="h-4 w-4 text-green-600" />
-          <span className="text-sm text-green-800">
-            SOS alerts enabled
-          </span>
+          <span className="text-sm text-green-800">SOS alerts enabled</span>
           <Button
             size="sm"
             variant="outline"
@@ -136,9 +133,7 @@ export function PushNotificationSetup() {
     <div className="fixed top-4 left-4 z-40 bg-blue-50 border border-blue-200 rounded-lg p-3 shadow-sm">
       <div className="flex items-center gap-2">
         <Bell className="h-4 w-4 text-blue-600" />
-        <span className="text-sm text-blue-800">
-          Enable SOS alerts
-        </span>
+        <span className="text-sm text-blue-800">Enable SOS alerts</span>
         <Button
           size="sm"
           onClick={handleEnableNotifications}
