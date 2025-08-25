@@ -15,6 +15,7 @@ import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWARegistration } from "@/components/pwa-registration";
 import { SOSButton } from "@/components/sos-button";
 import { PushNotificationSetup } from "@/components/push-notification-setup";
+import { APITestButton } from "@/components/api-test-button";
 import { toast } from "sonner";
 import { BarChart3 } from "lucide-react";
 import {
@@ -392,6 +393,9 @@ export default function Home() {
 
       {/* Push Notification Setup */}
       <PushNotificationSetup />
+
+      {/* API Test Button */}
+      <APITestButton />
 
       {/* SOS Button */}
       <SOSButton userPosition={position} />

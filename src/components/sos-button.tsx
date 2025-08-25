@@ -49,53 +49,144 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
   };
 
   const sendSOSAlert = async () => {
+    // Add timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log("⏰ SOS alert timeout reached");
+      setIsSending(false);
+      setShowConfirmDialog(false);
+      toast.error("SOS alert timed out. Please try again.");
+    }, 30000); // 30 second timeout
+
     try {
       setIsSending(true);
+      console.log("🚨 Starting SOS alert process...");
 
-      // Request notification permission if needed
+      // Request notification permission if needed (optional for testing)
+      console.log("📱 Requesting notification permission...");
       const permission = await requestNotificationPermission();
+      console.log("📱 Permission status:", permission);
 
+      // For testing, allow SOS alerts even without notification permission
       if (permission !== "granted") {
-        toast.error("Notification permission is required for SOS alerts");
-        return;
+        console.log(
+          "⚠️ Notification permission not granted, but continuing for testing..."
+        );
+        // Uncomment the lines below to require notification permission in production
+        // toast.error("Notification permission is required for SOS alerts");
+        // setIsSending(false);
+        // setShowConfirmDialog(false);
+        // return;
       }
 
       // Get user's current location
+      console.log("📍 Getting user location...");
       const location = userPosition || (await getCurrentLocation());
+      console.log("📍 Location:", location);
 
       if (!location) {
         toast.error("Unable to get your location");
+        setIsSending(false);
+        setShowConfirmDialog(false);
         return;
       }
 
       // Send SOS alert to server
-      const response = await fetch("/api/sos-alert", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          lat: location.lat,
-          lng: location.lng,
-          timestamp: new Date().toISOString(),
-          userId: "user-" + Date.now(), // In a real app, use actual user ID
-        }),
-      });
+      console.log("📡 Sending SOS alert to server...");
+      const alertData = {
+        lat: location.lat,
+        lng: location.lng,
+        timestamp: new Date().toISOString(),
+        userId: "user-" + Date.now(), // In a real app, use actual user ID
+      };
+      console.log("📡 Alert data:", alertData);
 
-      if (!response.ok) {
-        throw new Error("Failed to send SOS alert");
+      // Use absolute URL to ensure correct port
+      const apiUrl = `${window.location.origin}/api/sos-alert`;
+      console.log("📡 API URL:", apiUrl);
+
+      // Test the fetch request with a timeout
+      const controller = new AbortController();
+      const fetchTimeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+      let response;
+      try {
+        response = await fetch(apiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(alertData),
+          signal: controller.signal,
+        });
+
+        clearTimeout(fetchTimeoutId);
+      } catch (fetchError) {
+        clearTimeout(fetchTimeoutId);
+        console.error("📡 Fetch error:", fetchError);
+        const errorMessage =
+          fetchError instanceof Error
+            ? fetchError.message
+            : "Unknown fetch error";
+        throw new Error(`Network error: ${errorMessage}`);
       }
 
+      console.log("📡 Response status:", response.status);
+      console.log("📡 Response ok:", response.ok);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("📡 Response error:", errorText);
+        throw new Error(
+          `Failed to send SOS alert: ${response.status} ${errorText}`
+        );
+      }
+
+      const result = await response.json();
+      console.log("📡 Response result:", result);
+
       // Show local notification
+      console.log("🔔 Showing local notification...");
+      let notificationShown = false;
+
       if ("serviceWorker" in navigator && "PushManager" in window) {
-        const registration = await navigator.serviceWorker.ready;
-        await registration.showNotification("SOS Alert Sent!", {
-          body: "Emergency services and nearby users have been notified",
-          icon: "/icon-192x192.svg",
-          badge: "/icon-192x192.svg",
-          tag: "sos-alert",
-          requireInteraction: true,
-        });
+        try {
+          const registration = await navigator.serviceWorker.ready;
+          await registration.showNotification("SOS Alert Sent!", {
+            body: "Emergency services and nearby users have been notified",
+            icon: "/icon-192x192.svg",
+            badge: "/icon-192x192.svg",
+            tag: "sos-alert",
+            requireInteraction: true,
+          });
+          console.log("🔔 Local notification shown successfully");
+          notificationShown = true;
+        } catch (notificationError) {
+          console.error(
+            "🔔 Error showing local notification:",
+            notificationError
+          );
+          // Don't fail the whole process if local notification fails
+        }
+      }
+
+      // Fallback: Show browser notification if service worker fails
+      if (
+        !notificationShown &&
+        "Notification" in window &&
+        Notification.permission === "granted"
+      ) {
+        try {
+          new Notification("SOS Alert Sent!", {
+            body: "Emergency services and nearby users have been notified",
+            icon: "/icon-192x192.svg",
+          });
+          console.log("🔔 Fallback notification shown successfully");
+        } catch (fallbackError) {
+          console.error(
+            "🔔 Error showing fallback notification:",
+            fallbackError
+          );
+        }
       }
 
       toast.success(
@@ -104,12 +195,19 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
 
       // Auto-dial emergency number (if supported)
       if (navigator.userAgent.includes("Mobile")) {
+        console.log("📞 Auto-dialing emergency number...");
         window.location.href = "tel:911";
       }
+
+      console.log("✅ SOS alert process completed successfully");
     } catch (error) {
-      console.error("Error sending SOS alert:", error);
-      toast.error("Failed to send SOS alert. Please try again.");
+      console.error("❌ Error sending SOS alert:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+      toast.error(`Failed to send SOS alert: ${errorMessage}`);
     } finally {
+      console.log("🔄 Resetting SOS button state...");
+      clearTimeout(timeoutId);
       setIsSending(false);
       setShowConfirmDialog(false);
     }
