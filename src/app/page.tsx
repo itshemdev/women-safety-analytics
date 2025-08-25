@@ -13,10 +13,7 @@ import { AnalyticsSheet } from "../components/analytics-sheet";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWARegistration } from "@/components/pwa-registration";
-import { SOSButton } from "@/components/sos-button";
-import { PushNotificationSetup } from "@/components/push-notification-setup";
-import { APITestButton } from "@/components/api-test-button";
-import { NotificationPolling } from "@/components/notification-polling";
+
 import { toast } from "sonner";
 import { BarChart3 } from "lucide-react";
 import {
@@ -298,6 +295,15 @@ export default function Home() {
         center={mapCenter}
         zoom={mapZoom}
         onClick={handleMapClick}
+        options={{
+          disableDefaultUI: true,
+          zoomControl: false,
+          mapTypeControl: false,
+          scaleControl: false,
+          streetViewControl: false,
+          rotateControl: false,
+          fullscreenControl: false,
+        }}
       >
         {position && <Marker position={position} />}
 
@@ -391,18 +397,6 @@ export default function Home() {
       {/* PWA Components */}
       <PWARegistration />
       <PWAInstallPrompt />
-
-      {/* Push Notification Setup */}
-      <PushNotificationSetup />
-
-      {/* API Test Button */}
-      <APITestButton />
-
-      {/* Notification Polling */}
-      <NotificationPolling />
-
-      {/* SOS Button */}
-      <SOSButton userPosition={position} />
     </div>
   );
 }
