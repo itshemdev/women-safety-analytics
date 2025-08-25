@@ -12,6 +12,7 @@ import { LocationDetailPage } from "@/components/location-detail-page";
 import { AnalyticsSheet } from "../components/analytics-sheet";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { PWARegistration } from "@/components/pwa-registration";
+import { SOSButton } from "@/components/sos-button";
 
 import { toast } from "sonner";
 import { BarChart3 } from "lucide-react";
@@ -396,6 +397,9 @@ export default function Home() {
       {/* PWA Components */}
       <PWARegistration />
       <PWAInstallPrompt />
+
+      {/* SOS Button */}
+      <SOSButton />
     </div>
   );
 }

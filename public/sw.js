@@ -61,6 +61,24 @@ function doBackgroundSync() {
     // You can add logic here to sync data when connection is restored
 }
 
+// Handle messages from the main app
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SOS_NOTIFICATION') {
+        event.waitUntil(
+            self.registration.showNotification(
+                event.data.payload.title,
+                {
+                    ...event.data.payload,
+                    vibrate: [200, 100, 200, 100, 200, 100, 200],
+                    requireInteraction: true,
+                    silent: false,
+                    sound: 'default'
+                }
+            )
+        );
+    }
+});
+
 // Push notification handling
 self.addEventListener('push', (event) => {
     let notificationData = {
