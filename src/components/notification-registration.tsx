@@ -34,19 +34,30 @@ export function NotificationRegistration() {
           return;
         }
 
-        // For demonstration, we'll use a simple device identifier
-        // In production, you'd use proper VAPID keys and push subscriptions
-        const deviceId = `device_${Date.now()}_${Math.random()
-          .toString(36)
-          .substr(2, 9)}`;
+        // Create a simple subscription for demonstration
+        // In production, you'd use proper VAPID keys
+        const subscription = {
+          endpoint: `https://fcm.googleapis.com/fcm/send/${Date.now()}_${Math.random()
+            .toString(36)
+            .substr(2, 9)}`,
+          keys: {
+            p256dh: `p256dh_${Date.now()}_${Math.random()
+              .toString(36)
+              .substr(2, 9)}`,
+            auth: `auth_${Date.now()}_${Math.random()
+              .toString(36)
+              .substr(2, 9)}`,
+          },
+        };
 
-        // Save device identifier to Firestore
-        const exists = await isTokenExists(deviceId);
+        // Save subscription to Firestore
+        const subscriptionJson = JSON.stringify(subscription);
+        const exists = await isTokenExists(subscriptionJson);
 
         if (!exists) {
-          await saveDeviceToken(deviceId);
-          console.log("Device registered for notifications");
-          toast.success("Notifications enabled!");
+          await saveDeviceToken(subscriptionJson);
+          console.log("Device registered for push notifications");
+          toast.success("Push notifications enabled!");
         }
       } catch (error) {
         console.error("Error registering for notifications:", error);

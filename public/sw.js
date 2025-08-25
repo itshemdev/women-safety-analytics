@@ -82,24 +82,27 @@ self.addEventListener('message', (event) => {
 // Push notification handling
 self.addEventListener('push', (event) => {
     let notificationData = {
-        title: 'Women Safety Alert',
-        body: 'Safety alert!',
+        title: '🚨 SOS Alert',
+        body: 'Emergency situation detected! Please check the safety app immediately.',
         icon: '/icon-192x192.svg',
         badge: '/icon-192x192.svg',
-        vibrate: [200, 100, 200, 100, 200],
+        vibrate: [200, 100, 200, 100, 200, 100, 200],
+        requireInteraction: true,
+        tag: 'sos-alert',
         data: {
             dateOfArrival: Date.now(),
-            primaryKey: 1
+            type: 'sos-alert',
+            url: '/'
         },
         actions: [
             {
-                action: 'view-location',
-                title: 'View Location',
+                action: 'view',
+                title: 'View Details',
                 icon: '/icon-192x192.svg'
             },
             {
-                action: 'call-emergency',
-                title: 'Call Emergency',
+                action: 'dismiss',
+                title: 'Dismiss',
                 icon: '/icon-192x192.svg'
             }
         ]
@@ -109,16 +112,14 @@ self.addEventListener('push', (event) => {
     if (event.data) {
         try {
             const data = event.data.json();
-            if (data.notification) {
-                notificationData = {
-                    ...notificationData,
-                    ...data.notification,
-                    data: {
-                        ...notificationData.data,
-                        ...data.data
-                    }
-                };
-            }
+            notificationData = {
+                ...notificationData,
+                ...data,
+                data: {
+                    ...notificationData.data,
+                    ...data.data
+                }
+            };
         } catch (error) {
             console.log('Push data parsing failed, using default notification');
         }
@@ -133,21 +134,17 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
 
-    if (event.action === 'view-location') {
-        // Open the app with location data
+    if (event.action === 'view') {
+        // Open the app
         const notificationData = event.notification.data;
-        const url = notificationData && notificationData.lat && notificationData.lng
-            ? `/?lat=${notificationData.lat}&lng=${notificationData.lng}&alert=true`
-            : '/';
+        const url = notificationData && notificationData.url ? notificationData.url : '/';
 
         event.waitUntil(
             clients.openWindow(url)
         );
-    } else if (event.action === 'call-emergency') {
-        // Open phone dialer
-        event.waitUntil(
-            clients.openWindow('tel:911')
-        );
+    } else if (event.action === 'dismiss') {
+        // Just close the notification
+        console.log('SOS notification dismissed');
     } else {
         // Default action - open the app
         event.waitUntil(

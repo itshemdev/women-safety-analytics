@@ -13,20 +13,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For now, we'll use the browser's built-in push API
-    // In a production app, you'd use Firebase Admin SDK to send FCM messages
-    const tokens = deviceTokens.map((token) => token.token);
-
-    // Send notifications to all registered devices
-    const notificationPromises = tokens.map(async (token) => {
+    // Send actual push notifications to all registered devices
+    const notificationPromises = deviceTokens.map(async (deviceToken) => {
       try {
-        // This is a simplified version - in production you'd use FCM
-        // For now, we'll return success for demonstration
-        return { token, success: true };
+        // Parse the device token to get subscription details
+        const subscription = JSON.parse(deviceToken.token);
+
+        // Send push notification using Web Push protocol
+        const pushPayload = {
+          title: "🚨 SOS Alert",
+          body: "Emergency situation detected! Please check the safety app immediately.",
+          icon: "/icon-192x192.svg",
+          badge: "/icon-192x192.svg",
+          tag: "sos-alert",
+          requireInteraction: true,
+          vibrate: [200, 100, 200, 100, 200, 100, 200],
+          data: {
+            url: "/",
+            timestamp: Date.now(),
+            type: "sos-alert",
+          },
+          actions: [
+            {
+              action: "view",
+              title: "View Details",
+            },
+            {
+              action: "dismiss",
+              title: "Dismiss",
+            },
+          ],
+        };
+
+        // Send the push notification
+        const response = await fetch(subscription.endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            TTL: "86400", // 24 hours
+            Urgency: "high",
+          },
+          body: JSON.stringify(pushPayload),
+        });
+
+        if (response.ok) {
+          return { token: deviceToken.token, success: true };
+        } else {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
       } catch (error) {
-        console.error(`Failed to send notification to token: ${token}`, error);
+        console.error(
+          `Failed to send notification to device: ${deviceToken.token}`,
+          error
+        );
         return {
-          token,
+          token: deviceToken.token,
           success: false,
           error: error instanceof Error ? error.message : "Unknown error",
         };
