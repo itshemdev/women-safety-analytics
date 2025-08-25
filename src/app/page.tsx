@@ -11,7 +11,6 @@ import { LocationDetailsSheet } from "@/components/location-details-sheet";
 import { LocationDetailPage } from "@/components/location-detail-page";
 import { AnalyticsSheet } from "../components/analytics-sheet";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
-import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWARegistration } from "@/components/pwa-registration";
 
 import { toast } from "sonner";
