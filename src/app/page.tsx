@@ -303,7 +303,7 @@ export default function Home() {
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100%" }}
         center={{ lat: 13.0827, lng: 80.2707 }}
-        zoom={12}
+        zoom={11}
         onClick={handleMapClick}
         onLoad={setMapRef}
         onZoomChanged={() => {
