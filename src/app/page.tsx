@@ -61,10 +61,10 @@ export default function Home() {
     lng: number;
     radius: number;
   } | null>(null);
-  const [mapRef, setMapRef] = useState<google.maps.Map | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [currentZoom, setCurrentZoom] = useState(12);
+  const [mapZoom, setMapZoom] = useState(11);
+  const [mapCenter, setMapCenter] = useState({ lat: 13.0827, lng: 80.2707 });
 
   useEffect(() => {
     const loadSafetyZones = async () => {
@@ -130,14 +130,9 @@ export default function Home() {
       setTempCircle({ ...clickedLocation, radius: 1000 });
       setIsSheetOpen(true);
 
-      if (mapRef) {
-        // Preserve current zoom level when panning to clicked location
-        const currentZoomLevel = mapRef.getZoom() || currentZoom;
-        mapRef.panTo(
-          new google.maps.LatLng(clickedLocation.lat, clickedLocation.lng)
-        );
-        mapRef.setZoom(currentZoomLevel);
-      }
+      // Update map center and zoom
+      setMapCenter(clickedLocation);
+      setMapZoom(15);
     }
   };
 
@@ -145,21 +140,15 @@ export default function Home() {
     setSelectedSavedLocation(location);
     setIsDetailOpen(true);
 
-    // Center map on the clicked location
-    if (mapRef) {
-      const currentZoomLevel = mapRef.getZoom() || currentZoom;
-      mapRef.panTo(new google.maps.LatLng(location.lat, location.lng));
-      mapRef.setZoom(currentZoomLevel);
-    }
+    // Center map on the clicked location and zoom in
+    setMapCenter({ lat: location.lat, lng: location.lng });
+    setMapZoom(16);
   };
 
   const handleCircleClick = (lat: number, lng: number) => {
-    // Center map on the clicked circle
-    if (mapRef) {
-      const currentZoomLevel = mapRef.getZoom() || currentZoom;
-      mapRef.panTo(new google.maps.LatLng(lat, lng));
-      mapRef.setZoom(currentZoomLevel);
-    }
+    // Center map on the clicked circle and zoom in
+    setMapCenter({ lat, lng });
+    setMapZoom(15);
   };
 
   const handleSaveLocation = async (details: LocationDetailsInput) => {
@@ -175,12 +164,9 @@ export default function Home() {
       setTempMarker(null);
       setTempCircle(null);
 
-      if (mapRef) {
-        // Preserve current zoom level and only pan to the new location
-        const currentZoomLevel = mapRef.getZoom() || currentZoom;
-        mapRef.panTo(new google.maps.LatLng(newZone.lat, newZone.lng));
-        mapRef.setZoom(currentZoomLevel);
-      }
+      // Update map center and zoom to the saved location
+      setMapCenter({ lat: newZone.lat, lng: newZone.lng });
+      setMapZoom(15);
 
       toast.success("Location saved successfully!");
     } catch (error) {
@@ -302,15 +288,7 @@ export default function Home() {
 
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100%" }}
-        center={{ lat: 13.0827, lng: 80.2707 }}
-        zoom={11}
-        onClick={handleMapClick}
-        onLoad={setMapRef}
-        onZoomChanged={() => {
-          if (mapRef) {
-            setCurrentZoom(mapRef.getZoom() || 12);
-          }
-        }}
+        center={mapCenter}
       >
         {position && <Marker position={position} />}
 
