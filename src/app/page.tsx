@@ -12,6 +12,7 @@ import { LocationDetailPage } from "@/components/location-detail-page";
 import { AnalyticsSheet } from "../components/analytics-sheet";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { PWARegistration } from "@/components/pwa-registration";
+import { NotificationRegistration } from "@/components/notification-registration";
 import { SOSButton } from "@/components/sos-button";
 
 import { toast } from "sonner";
@@ -396,6 +397,7 @@ export default function Home() {
 
       {/* PWA Components */}
       <PWARegistration />
+      <NotificationRegistration />
       <PWAInstallPrompt />
 
       {/* SOS Button */}

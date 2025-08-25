@@ -20,11 +20,11 @@ export function SOSButton() {
 
   const sendSOSNotification = async () => {
     try {
-      // Check if service worker is available
+      // First, show local notification
       if ("serviceWorker" in navigator && "PushManager" in window) {
         const registration = await navigator.serviceWorker.ready;
 
-        // Send message to service worker to trigger push notification
+        // Send message to service worker to trigger local push notification
         await registration.active?.postMessage({
           type: "SOS_NOTIFICATION",
           payload: {
@@ -42,11 +42,22 @@ export function SOSButton() {
             ],
           },
         });
+      }
 
-        toast.success("SOS alert sent to all devices!");
+      // Then send to all registered devices via API
+      const response = await fetch("/api/send-sos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast.success(`SOS alert sent to ${result.totalDevices} devices!`);
       } else {
-        // Fallback for browsers without push support
-        toast.error("Push notifications not supported in this browser");
+        toast.error(result.message || "Failed to send SOS alert");
       }
     } catch (error) {
       console.error("Error sending SOS notification:", error);
