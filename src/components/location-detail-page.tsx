@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { MapPin, AlertTriangle, Shield, Info, X } from "lucide-react";
+import { MapPin, AlertTriangle, Shield, Info } from "lucide-react";
 import { LocationDetailsWithId } from "@/lib/firestoreService";
 
 interface LocationDetailPageProps {

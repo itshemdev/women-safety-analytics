@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import {
   GoogleMap,
   useJsApiLoader,
@@ -11,6 +10,9 @@ import { useEffect, useState } from "react";
 import { LocationDetailsSheet } from "@/components/location-details-sheet";
 import { LocationDetailPage } from "@/components/location-detail-page";
 import { AnalyticsSheet } from "../components/analytics-sheet";
+import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
+import { OfflineIndicator } from "@/components/offline-indicator";
+import { PWARegistration } from "@/components/pwa-registration";
 import { toast } from "sonner";
 import { BarChart3 } from "lucide-react";
 import {
@@ -19,6 +21,7 @@ import {
   deleteSafetyZone,
   LocationDetailsWithId,
 } from "@/lib/firestoreService";
+import { Timestamp } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 
@@ -158,7 +161,7 @@ export default function Home() {
       const newZone: LocationDetailsWithId = {
         ...details,
         id: zoneId,
-        createdAt: new Date() as any,
+        createdAt: Timestamp.now(),
       };
       setSavedLocations((prev) => [newZone, ...prev]);
       setTempMarker(null);
@@ -380,6 +383,10 @@ export default function Home() {
         onOpenChange={setIsAnalyticsOpen}
         savedLocations={savedLocations}
       />
+
+      {/* PWA Components */}
+      <PWARegistration />
+      <PWAInstallPrompt />
     </div>
   );
 }
