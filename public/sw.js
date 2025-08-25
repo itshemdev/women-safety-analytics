@@ -63,31 +63,51 @@ function doBackgroundSync() {
 
 // Push notification handling
 self.addEventListener('push', (event) => {
-    const options = {
-        body: event.data ? event.data.text() : 'Safety alert!',
-        icon: '/icon-192x192.png',
-        badge: '/icon-192x192.png',
-        vibrate: [100, 50, 100],
+    let notificationData = {
+        title: 'Women Safety Alert',
+        body: 'Safety alert!',
+        icon: '/icon-192x192.svg',
+        badge: '/icon-192x192.svg',
+        vibrate: [200, 100, 200, 100, 200],
         data: {
             dateOfArrival: Date.now(),
             primaryKey: 1
         },
         actions: [
             {
-                action: 'explore',
-                title: 'View Details',
-                icon: '/icon-192x192.png'
+                action: 'view-location',
+                title: 'View Location',
+                icon: '/icon-192x192.svg'
             },
             {
-                action: 'close',
-                title: 'Close',
-                icon: '/icon-192x192.png'
+                action: 'call-emergency',
+                title: 'Call Emergency',
+                icon: '/icon-192x192.svg'
             }
         ]
     };
 
+    // Parse push data if available
+    if (event.data) {
+        try {
+            const data = event.data.json();
+            if (data.notification) {
+                notificationData = {
+                    ...notificationData,
+                    ...data.notification,
+                    data: {
+                        ...notificationData.data,
+                        ...data.data
+                    }
+                };
+            }
+        } catch (error) {
+            console.log('Push data parsing failed, using default notification');
+        }
+    }
+
     event.waitUntil(
-        self.registration.showNotification('Women Safety Alert', options)
+        self.registration.showNotification(notificationData.title, notificationData)
     );
 });
 
@@ -95,7 +115,23 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
     event.notification.close();
 
-    if (event.action === 'explore') {
+    if (event.action === 'view-location') {
+        // Open the app with location data
+        const notificationData = event.notification.data;
+        const url = notificationData && notificationData.lat && notificationData.lng
+            ? `/?lat=${notificationData.lat}&lng=${notificationData.lng}&alert=true`
+            : '/';
+
+        event.waitUntil(
+            clients.openWindow(url)
+        );
+    } else if (event.action === 'call-emergency') {
+        // Open phone dialer
+        event.waitUntil(
+            clients.openWindow('tel:911')
+        );
+    } else {
+        // Default action - open the app
         event.waitUntil(
             clients.openWindow('/')
         );

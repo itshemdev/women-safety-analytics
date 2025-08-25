@@ -13,6 +13,8 @@ import { AnalyticsSheet } from "../components/analytics-sheet";
 import { PWAInstallPrompt } from "@/components/pwa-install-prompt";
 import { OfflineIndicator } from "@/components/offline-indicator";
 import { PWARegistration } from "@/components/pwa-registration";
+import { SOSButton } from "@/components/sos-button";
+import { PushNotificationSetup } from "@/components/push-notification-setup";
 import { toast } from "sonner";
 import { BarChart3 } from "lucide-react";
 import {
@@ -387,6 +389,12 @@ export default function Home() {
       {/* PWA Components */}
       <PWARegistration />
       <PWAInstallPrompt />
+
+      {/* Push Notification Setup */}
+      <PushNotificationSetup />
+
+      {/* SOS Button */}
+      <SOSButton userPosition={position} />
     </div>
   );
 }
