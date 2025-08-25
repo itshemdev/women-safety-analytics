@@ -289,6 +289,7 @@ export default function Home() {
       <GoogleMap
         mapContainerStyle={{ width: "100%", height: "100%" }}
         center={mapCenter}
+        zoom={11}
       >
         {position && <Marker position={position} />}
 
