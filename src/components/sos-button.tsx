@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Phone, MapPin, Users } from "lucide-react";
 import { toast } from "sonner";
+import { realPushNotificationService } from "@/lib/realPushNotificationService";
 import {
   Dialog,
   DialogContent,
@@ -101,7 +102,7 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
       console.log("📡 Alert data:", alertData);
 
       // Use absolute URL to ensure correct port
-      const apiUrl = `${window.location.origin}/api/sos-alert`;
+      const apiUrl = `${window.location.origin}/api/real-sos-alert`;
       console.log("📡 API URL:", apiUrl);
 
       // Test the fetch request with a timeout
@@ -115,7 +116,10 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(alertData),
+          body: JSON.stringify({
+            ...alertData,
+            deviceId: realPushNotificationService.getDeviceId(),
+          }),
           signal: controller.signal,
         });
 
@@ -313,7 +317,7 @@ export function SOSButton({ userPosition }: SOSButtonProps) {
               <div className="text-sm">
                 <div className="font-medium">Emergency Services</div>
                 <div className="text-red-600">
-                  911 will be called automatically
+                  100 will be called automatically
                 </div>
               </div>
             </div>

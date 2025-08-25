@@ -16,6 +16,7 @@ import { PWARegistration } from "@/components/pwa-registration";
 import { SOSButton } from "@/components/sos-button";
 import { PushNotificationSetup } from "@/components/push-notification-setup";
 import { APITestButton } from "@/components/api-test-button";
+import { NotificationPolling } from "@/components/notification-polling";
 import { toast } from "sonner";
 import { BarChart3 } from "lucide-react";
 import {
@@ -396,6 +397,9 @@ export default function Home() {
 
       {/* API Test Button */}
       <APITestButton />
+
+      {/* Notification Polling */}
+      <NotificationPolling />
 
       {/* SOS Button */}
       <SOSButton userPosition={position} />
