@@ -10,7 +10,6 @@ export function PWARegistration() {
       navigator.serviceWorker
         .register("/sw.js")
         .then((registration) => {
-          console.log("SW registered: ", registration);
 
           // Handle updates
           registration.addEventListener("updatefound", () => {
@@ -34,7 +33,6 @@ export function PWARegistration() {
           });
         })
         .catch((registrationError) => {
-          console.log("SW registration failed: ", registrationError);
         });
 
       // Handle service worker updates

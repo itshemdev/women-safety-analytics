@@ -60,7 +60,6 @@ export function SOSButton() {
         toast.error(result.message || "Failed to send SOS alert");
       }
     } catch (error) {
-      console.error("Error sending SOS notification:", error);
       toast.error("Failed to send SOS alert");
     }
   };

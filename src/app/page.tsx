@@ -101,7 +101,6 @@ export default function Home() {
           setLoadingProgress(0);
         }, 200);
       } catch (error) {
-        console.error("Error loading safety zones:", error);
         toast.error("Failed to load safety zones");
         setIsLoading(false);
         setLoadingProgress(0);
@@ -115,7 +114,7 @@ export default function Home() {
     const watchId = navigator.geolocation.watchPosition(
       (pos) =>
         setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      (err) => console.error(err),
+      (err) => {},
       { enableHighAccuracy: true }
     );
 
@@ -175,7 +174,6 @@ export default function Home() {
 
       toast.success("Location saved successfully!");
     } catch (error) {
-      console.error("Error saving location:", error);
       toast.error("Failed to save location");
     } finally {
       setIsSaving(false);
@@ -188,7 +186,6 @@ export default function Home() {
       setSavedLocations((prev) => prev.filter((loc) => loc.id !== location.id));
       toast.success("Location deleted successfully!");
     } catch (error) {
-      console.error("Error deleting location:", error);
       toast.error("Failed to delete location");
     }
   };

@@ -109,7 +109,6 @@ export async function POST(request: NextRequest) {
       note: "This is a simulation. For real FCM, you need Firebase Admin SDK setup.",
     });
   } catch (error) {
-    console.error("Error sending FCM SOS notification:", error);
     return NextResponse.json(
       { error: "Failed to send FCM SOS notification" },
       { status: 500 }

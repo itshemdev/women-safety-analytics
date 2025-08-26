@@ -61,17 +61,13 @@ export async function POST(request: NextRequest) {
         } else {
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-      } catch (error) {
-        console.error(
-          `Failed to send notification to device: ${deviceToken.token}`,
-          error
-        );
-        return {
-          token: deviceToken.token,
-          success: false,
-          error: error instanceof Error ? error.message : "Unknown error",
-        };
-      }
+              } catch (error) {
+          return {
+            token: deviceToken.token,
+            success: false,
+            error: error instanceof Error ? error.message : "Unknown error",
+          };
+        }
     });
 
     const results = await Promise.all(notificationPromises);
@@ -86,7 +82,6 @@ export async function POST(request: NextRequest) {
       results,
     });
   } catch (error) {
-    console.error("Error sending SOS notification:", error);
     return NextResponse.json(
       { error: "Failed to send SOS notification" },
       { status: 500 }

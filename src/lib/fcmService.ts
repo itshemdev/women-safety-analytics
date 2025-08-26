@@ -40,10 +40,9 @@ export const saveDeviceToken = async (
       deviceToken
     );
     return docRef.id;
-  } catch (error) {
-    console.error("Error saving device token:", error);
-    throw error;
-  }
+      } catch (error) {
+      throw error;
+    }
 };
 
 // Get all device tokens
@@ -62,20 +61,18 @@ export const getAllDeviceTokens = async (): Promise<DeviceToken[]> => {
     });
 
     return tokens;
-  } catch (error) {
-    console.error("Error getting device tokens:", error);
-    throw error;
-  }
+      } catch (error) {
+      throw error;
+    }
 };
 
 // Delete device token
 export const deleteDeviceToken = async (tokenId: string): Promise<void> => {
   try {
     await deleteDoc(doc(db, DEVICE_TOKENS_COLLECTION, tokenId));
-  } catch (error) {
-    console.error("Error deleting device token:", error);
-    throw error;
-  }
+      } catch (error) {
+      throw error;
+    }
 };
 
 // Check if token already exists
@@ -87,10 +84,9 @@ export const isTokenExists = async (token: string): Promise<boolean> => {
     );
     const querySnapshot = await getDocs(q);
     return !querySnapshot.empty;
-  } catch (error) {
-    console.error("Error checking token existence:", error);
-    return false;
-  }
+      } catch (error) {
+      return false;
+    }
 };
 
 // Request FCM token for background notifications
@@ -98,7 +94,6 @@ export const requestFCMToken = async (): Promise<string | null> => {
   try {
     // Check if Firebase Messaging is available
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      console.log("Push notifications not supported");
       return null;
     }
 
@@ -107,7 +102,6 @@ export const requestFCMToken = async (): Promise<string | null> => {
     // Request notification permission
     const permission = await Notification.requestPermission();
     if (permission !== "granted") {
-      console.log("Notification permission denied");
       return null;
     }
 
@@ -117,10 +111,8 @@ export const requestFCMToken = async (): Promise<string | null> => {
       .toString(36)
       .substr(2, 9)}`;
 
-    console.log("FCM token generated:", fcmToken);
     return fcmToken;
-  } catch (error) {
-    console.error("Error requesting FCM token:", error);
-    return null;
-  }
+      } catch (error) {
+      return null;
+    }
 };

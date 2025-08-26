@@ -34,10 +34,9 @@ export const saveSafetyZone = async (
       createdAt: Timestamp.now(),
     });
     return docRef.id;
-  } catch (error) {
-    console.error("Error saving safety zone:", error);
-    throw error;
-  }
+      } catch (error) {
+      throw error;
+    }
 };
 
 export const getSafetyZones = async (): Promise<LocationDetailsWithId[]> => {
@@ -57,17 +56,15 @@ export const getSafetyZones = async (): Promise<LocationDetailsWithId[]> => {
     });
 
     return zones;
-  } catch (error) {
-    console.error("Error getting safety zones:", error);
-    throw error;
-  }
+      } catch (error) {
+      throw error;
+    }
 };
 
 export const deleteSafetyZone = async (zoneId: string): Promise<void> => {
   try {
     await deleteDoc(doc(db, COLLECTION_NAME, zoneId));
-  } catch (error) {
-    console.error("Error deleting safety zone:", error);
-    throw error;
-  }
+      } catch (error) {
+      throw error;
+    }
 };
